@@ -149,6 +149,7 @@ namespace Api
             }
             else
             {
+                app.UseStatusCodePages();
                 app.UseHsts();
             }
 

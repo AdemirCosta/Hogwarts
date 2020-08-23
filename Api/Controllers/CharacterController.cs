@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using Api.Models.Dtos;
+﻿using Api.Models.Dtos;
 using AutoMapper;
 using Core.Entities;
-using Core.Exceptions;
 using Core.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Api.Controllers
 {
@@ -30,35 +27,59 @@ namespace Api.Controllers
         [Authorize]
         public ActionResult<Character> Get(Guid id)
         {
-            return Ok(_characterService.Get(id));
+            var character = _characterService.Get(id);
+
+            if (character != null)
+                return Ok(character);
+            else
+                return NotFound();
         }
 
         [HttpGet]
         [Authorize]
         public ActionResult<List<Character>> Get([FromQuery] List<Guid> ids)
         {
-            return Ok(_characterService.Get(ids));
+            var characters = _characterService.Get(ids);
+
+            if (characters != null && characters.Count() > 0)
+                return Ok(characters);
+            else
+                return NotFound();
         }
 
         [HttpGet("byHouse/{houseId}")]
         [Authorize]
         public ActionResult<List<Character>> GetByHouseId(string houseId)
         {
-            return Ok(_characterService.GetByHouseId(houseId));
+            var characters = _characterService.GetByHouseId(houseId);
+
+            if (characters != null && characters.Count() > 0)
+                return Ok(characters);
+            else
+                return NotFound();
         }
 
         [HttpPost]
         [Authorize]
         public ActionResult Post([FromBody] CharacterDto characterDto)
         {
-            return Ok(_characterService.Update(_mapper.Map<Character>(characterDto)));
+            try
+            {
+                return Ok(_characterService.Update(_mapper.Map<Character>(characterDto)));
+            }
+            catch(System.Web.Http.HttpResponseException exception)
+            {
+                return StatusCode((int)exception.Response.StatusCode);
+            }
         }
 
         [HttpPost("delete/{id}")]
         public ActionResult Delete(Guid id)
         {
-            _characterService.Delete(id);
-            return Ok();
+            if (_characterService.Delete(id))
+                return Ok();
+            else
+                return NotFound();
         }
     }
 }

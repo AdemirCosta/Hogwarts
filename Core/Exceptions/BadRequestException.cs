@@ -9,14 +9,8 @@ namespace Core.Exceptions
 {
     public static class BadRequestException
     {
-        public static void Throw(string message = "")
+        public static void Throw()
         {
-            var response = new HttpResponseMessage(HttpStatusCode.BadRequest)
-            {
-                Content = new StringContent(message)
-            };
-
-            //throw new HttpResponseException(response);
             throw new HttpResponseException(HttpStatusCode.BadRequest);
         }
     }

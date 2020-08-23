@@ -11,6 +11,6 @@ namespace Core.Services
         List<Character> Get(List<Guid> ids);
         List<Character> GetByHouseId(string houseId);
         Character Update(Character character);
-        void Delete(Guid id);
+        bool Delete(Guid id);
     }
 }

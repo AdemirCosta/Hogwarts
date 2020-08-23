@@ -64,14 +64,17 @@ namespace Core.Services
             }
         }
 
-        public void Delete(Guid id)
+        public bool Delete(Guid id)
         {
             var character = _characterRepository.Get(id);
 
             if (character != null)
             {
                 _characterRepository.Delete(character);
+                return true;
             }
+
+            return false;
         }
 
         public bool ValidateHouse(string houseId)

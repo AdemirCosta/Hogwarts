@@ -1,16 +1,19 @@
 ﻿using Core.Entities;
 using Core.Interfaces;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Web.Http;
 
 namespace Data.Repositories
 {
-    public class HouseRepository: IHouseRepository
+    public class HouseRepository : IHouseRepository
     {
         private readonly IHttpClientFactory _clientFactory;
         private const string _houseApiUrl = "https://www.potterapi.com/v1/houses";
@@ -34,14 +37,21 @@ namespace Data.Repositories
 
             if (response.IsSuccessStatusCode)
             {
-                using var responseStream = await response.Content.ReadAsStreamAsync();
-                var house = await JsonSerializer.DeserializeAsync<IEnumerable<House>>(responseStream);
+                try
+                {
+                    using var responseStream = await response.Content.ReadAsStreamAsync();
+                    var house = await JsonSerializer.DeserializeAsync<IEnumerable<House>>(responseStream);
 
-                return house.FirstOrDefault()?._id == houseId;
+                    return house.FirstOrDefault()?._id == houseId;
+                }
+                catch
+                {
+                    throw new HttpResponseException(HttpStatusCode.NotFound);
+                }
             }
             else
             {
-                throw new HttpRequestException("It was not possible to check house existence");
+                throw new HttpResponseException(HttpStatusCode.InternalServerError);
             }
         }
     }
